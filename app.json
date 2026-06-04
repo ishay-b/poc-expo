@@ -11,6 +11,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.prisonguard.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -26,6 +27,12 @@
     "plugins": [
       "expo-router",
       "./plugins/withNetworkSecurityConfig"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ad1c5e54-bf05-4f2c-ba6c-13fe44f65f46"
+      }
+    }
   }
 }
