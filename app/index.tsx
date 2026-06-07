@@ -3,9 +3,10 @@ import { Platform, StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, 
 import { WebView } from 'react-native-webview';
 import type { WebViewErrorEvent } from 'react-native-webview/lib/WebViewTypes';
 import { File, Paths } from 'expo-file-system';
+import Constants from 'expo-constants';
 
 const CONFIG_FILENAME = 'config.json';
-const DEFAULT_URL = 'https://google.com';
+const DEFAULT_URL = (Constants.expoConfig?.extra?.url as string | undefined) || 'https://google.com';
 
 interface AppConfig {
   url: string;

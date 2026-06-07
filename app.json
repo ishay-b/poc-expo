@@ -29,6 +29,7 @@
       "./plugins/withNetworkSecurityConfig"
     ],
     "extra": {
+      "url": "https://google.com",
       "router": {},
       "eas": {
         "projectId": "ad1c5e54-bf05-4f2c-ba6c-13fe44f65f46"
