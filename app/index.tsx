@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { Platform, StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { WebView } from 'react-native-webview';
 import type { WebViewErrorEvent } from 'react-native-webview/lib/WebViewTypes';
 import { File, Paths } from 'expo-file-system';
 import Constants from 'expo-constants';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 const CONFIG_FILENAME = 'config.json';
 const DEFAULT_URL = (Constants.expoConfig?.extra?.url as string | undefined) || 'https://google.com';
@@ -61,6 +63,12 @@ export default function HomeScreen() {
   const [editingUrl, setEditingUrl] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const webViewRef = useRef<WebView>(null);
+
+  const { expoPushToken } = usePushNotifications((notifUrl) => {
+    writeConfig(notifUrl);
+    setUrl(notifUrl);
+    setError(null);
+  });
 
   function handleError(event: WebViewErrorEvent) {
     const { code, description } = event.nativeEvent;
@@ -151,25 +159,44 @@ export default function HomeScreen() {
     );
   }
 
+  const injectedJavaScript = expoPushToken
+    ? `window.expoPushToken = ${JSON.stringify(expoPushToken)}; true;`
+    : undefined;
+
   return (
-    <WebView
-      ref={webViewRef}
-      style={styles.webview}
-      source={{ uri: url }}
-      renderLoading={() => (
-        <View style={styles.loader}>
-          <ActivityIndicator size="large" />
-        </View>
+    <View style={styles.webview}>
+      <WebView
+        ref={webViewRef}
+        style={styles.webview}
+        source={{ uri: url }}
+        injectedJavaScript={injectedJavaScript}
+        renderLoading={() => (
+          <View style={styles.loader}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
+        startInLoadingState
+        onError={handleError}
+        onHttpError={(event) => {
+          const { statusCode } = event.nativeEvent;
+          if (statusCode >= 500) {
+            setError(`שגיאת שרת (${statusCode})`);
+          }
+        }}
+      />
+      {expoPushToken && (
+        <TouchableOpacity
+          style={styles.tokenBanner}
+          onPress={() => {
+            Clipboard.setStringAsync(expoPushToken);
+            Alert.alert('הועתק', expoPushToken);
+          }}
+        >
+          <Text style={styles.tokenLabel}>Push Token (לחץ להעתקה)</Text>
+          <Text style={styles.tokenText} numberOfLines={1}>{expoPushToken}</Text>
+        </TouchableOpacity>
       )}
-      startInLoadingState
-      onError={handleError}
-      onHttpError={(event) => {
-        const { statusCode } = event.nativeEvent;
-        if (statusCode >= 500) {
-          setError(`שגיאת שרת (${statusCode})`);
-        }
-      }}
-    />
+    </View>
   );
 }
 
@@ -258,5 +285,23 @@ const styles = StyleSheet.create({
   webChangeUrlText: {
     color: '#fff',
     fontSize: 14,
+  },
+  tokenBanner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    padding: 10,
+  },
+  tokenLabel: {
+    color: '#aaa',
+    fontSize: 10,
+    marginBottom: 2,
+  },
+  tokenText: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: 'monospace',
   },
 });

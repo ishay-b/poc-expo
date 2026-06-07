@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "184197373246",
+    "project_id": "expo-poc-8666f",
+    "storage_bucket": "expo-poc-8666f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184197373246:android:d18de55c2974a0eac2206f",
+        "android_client_info": {
+          "package_name": "com.prisonguard.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtsa-gBrc2zvwB42gUQWX6-8n3sfyMExE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
